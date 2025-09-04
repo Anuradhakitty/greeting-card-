@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sorry, sel my uyire ❤️</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #ff99cc, #cc66ff);
+      overflow: hidden;
+      font-family: "Georgia", serif;
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 24px;
+      padding: 2rem;
+      max-width: 720px;
+      text-align: center;
+      backdrop-filter: blur(8px);
+      color: white;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+      position: relative;
+      z-index: 2;
+    }
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      text-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
+    p {
+      font-size: 1.2rem;
+      line-height: 1.5;
+      min-height: 100px;
+    }
+    button {
+      margin: 10px;
+      padding: 10px 18px;
+      border: none;
+      border-radius: 18px;
+      font-size: 1rem;
+      cursor: pointer;
+      background: rgba(255,255,255,0.85);
+      color: #7a2f7a;
+      transition: transform 0.2s;
+    }
+    button:hover { transform: scale(1.08); }
+
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="hearts"></canvas>
+  <div class="card">
+    <h1>Sorry, sel my uyire</h1>
+    <p id="message"></p>
+    <button id="replay">Replay message</button>
+    <button id="confetti">Confetti ✨</button>
+  </div>
+
+  <script>
+    const message = "I know I get possessive sometimes; it's only because I love you so much. I miss you like crazy.";
+    const msgEl = document.getElementById("message");
+    const replayBtn = document.getElementById("replay");
+    const confettiBtn = document.getElementById("confetti");
+
+    function typeWriter(text, speed = 40) {
+      msgEl.textContent = "";
+      let i = 0;
+      const interval = setInterval(() => {
+        msgEl.textContent += text.charAt(i);
+        i++;
+        if (i >= text.length) clearInterval(interval);
+      }, speed);
+    }
+
+    replayBtn.addEventListener("click", () => typeWriter(message));
+    typeWriter(message);
+
+    // Floating hearts animation
+    const canvas = document.getElementById("hearts");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    let hearts = [];
+
+    class Heart {
+      constructor(x, y, size, color) {
+        this.x = x;
+        this.y = y;
+        this.size = size;
+        this.color = color;
+        this.vx = (Math.random() - 0.5) * 2;
+        this.vy = - (1 + Math.random() * 2);
+        this.life = 1;
+      }
+      draw() {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.scale(this.size, this.size);
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.bezierCurveTo(-1, -1, -2, 1, 0, 2);
+        ctx.bezierCurveTo(2, 1, 1, -1, 0, 0);
+        ctx.fill();
+        ctx.restore();
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.life -= 0.005;
+      }
+    }
+
+    function spawnHeart(x, y) {
+      const size = 8 + Math.random() * 12;
+      const color = `hsl(${Math.random() * 360}, 70%, 70%)`;
+      hearts.push(new Heart(x, y, size, color));
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      hearts.forEach((h, i) => {
+        h.update();
+        h.draw();
+        if (h.life <= 0) hearts.splice(i, 1);
+      });
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    // Confetti burst
+    confettiBtn.addEventListener("click", () => {
+      for (let i = 0; i < 100; i++) {
+        spawnHeart(window.innerWidth/2, window.innerHeight/2);
+      }
+    });
+
+    // Click anywhere to spawn a heart
+    document.body.addEventListener("click", (e) => {
+      spawnHeart(e.clientX, e.clientY);
+    });
+
+    window.addEventListener("resize", () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+  </script>
+</body>
+</html>
